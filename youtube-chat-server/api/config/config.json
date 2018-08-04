@@ -1,0 +1,6 @@
+{
+  "production": {
+    "JWT_SECRET": "fjapfjsafklsajfklsajfsaklj1212",
+    "DB_Host": "mongodb://admin:password1@ds145292.mlab.com:45292/youtube-chat"
+  }
+}

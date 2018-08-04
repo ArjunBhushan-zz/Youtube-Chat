@@ -9,6 +9,7 @@ class App extends Component {
     let routes = (
       <Switch>
         <Route path= "/" exact component={VideoChat}/>
+        <Redirect to = '/'/>
       </Switch>
     );
     return (
