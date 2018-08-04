@@ -1,0 +1,15 @@
+.Player {
+  margin: auto;
+}
+
+.Form {
+  display: grid;
+  grid-template-columns: 70% 30%;
+}
+
+.Form input {
+  border: 2px solid black;
+}
+.Form button {
+  text-align: left;
+}
