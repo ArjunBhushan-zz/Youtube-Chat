@@ -156,16 +156,26 @@ app.post('/users', (req, res) => {
     body = _.pick(body, ['username', 'password']);
   }
   var user = new User(body);
-  user.save()
-    .then(() => {
-      return user.generateAuthToken();
-    }).then((token) => {
-      let data = JSON.stringify(user, undefined, 2);
-      res.header('x-auth', token).send({...JSON.parse(data), token});
+  User.findOne({username: body.username})
+    .then((duplicate) => {
+      if (duplicate) {
+        res.status(401).send();
+      }else{
+        user.save()
+          .then(() => {
+            return user.generateAuthToken();
+          }).then((token) => {
+            let data = JSON.stringify(user, undefined, 2);
+            res.header('x-auth', token).send({...JSON.parse(data), token});
+          })
+          .catch((err) => {
+            res.status(400).send(err);
+          });
+      }
     })
     .catch((err) => {
       res.status(400).send(err);
-    });
+    })
 });
 
 app.patch('/users/me/', authenticate, (req,res) =>{

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import NavigationItem from './NavigationItem/NagivationItem';
 import styles from './NavigationItems.css';
 

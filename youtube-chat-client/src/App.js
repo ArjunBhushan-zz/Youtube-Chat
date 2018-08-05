@@ -6,7 +6,13 @@ import VideoChat from './containers/VideoChat/VideoChat';
 import Auth from './containers/Auth/Auth';
 import Home from './containers/Home/Home';
 import Logout from './containers/Auth/Logout/Logout';
+import { connect } from 'react-redux';
+import * as actions from './store/actions/index';
+
 class App extends Component {
+  componentDidMount() {
+    this.props.checkState();
+  }
   render() {
     let routes = (
       <Switch>
@@ -25,5 +31,10 @@ class App extends Component {
   }
 }
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    checkState: () => dispatch(actions.authCheckState())
+  };
+};
 
-export default withRouter(App);
+export default withRouter(connect(null, mapDispatchToProps)(App));
