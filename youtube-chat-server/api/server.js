@@ -8,11 +8,12 @@ const {User} = require('./models/user');
 const {Room} = require('./models/room');
 const {Message} = require('./models/message');
 const {authenticate} = require('./middleware/authenticate');
-
+const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 6000;
 
 app.use(bodyParser.json());
+app.use(cors());
 
 app.use((req, res, next) => {
   const time = new Date().toString();
@@ -49,7 +50,6 @@ app.get('/rooms', (req,res) => {
 
 app.get('/rooms/:roomName', authenticate, (req, res) => {
   const roomName = req.params.roomName;
-  console.log(roomName);
   Room.findOne({name: roomName})
     .then((room) => {
       if (!room) {
@@ -84,7 +84,6 @@ app.post('/rooms/message/:roomName', authenticate, (req, res) => {
             });
         })
         .catch((err) => {
-          console.log(err);
           res.status(400).send(err);
         });
     })
@@ -153,12 +152,16 @@ app.delete('/rooms/:roomName', authenticate, (req, res) => {
 
 app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['username', 'password', 'display']);
+  if (!body.display) {
+    body = _.pick(body, ['username', 'password']);
+  }
   var user = new User(body);
   user.save()
     .then(() => {
       return user.generateAuthToken();
     }).then((token) => {
-      res.header('x-auth', token).send(user);
+      let data = JSON.stringify(user, undefined, 2);
+      res.header('x-auth', token).send({...JSON.parse(data), token});
     })
     .catch((err) => {
       res.status(400).send(err);
@@ -209,7 +212,8 @@ app.post('/users/login', (req, res) => {
   User.findByCredentials(login.username, login.password)
     .then((user) => {
       return user.generateAuthToken().then((token) => {
-        res.header('x-auth', token).send(user);
+        let data = JSON.stringify(user, undefined, 2);
+        res.header('x-auth', token).send({...JSON.parse(data), token});
       });
     }).catch((err) => {
       res.status(404).send();
