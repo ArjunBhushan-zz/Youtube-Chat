@@ -29,12 +29,34 @@ const processError = (error) => {
   }
 };
 
-export const logout = () => {
+const logoutHandler = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('username');
   return {
       type: actionTypes.AUTH_LOGOUT
   };
+};
+
+export const logout = () => {
+  return (dispatch) => {
+    const token = localStorage.getItem('token');
+    if (!token){
+      return dispatch(logoutHandler());
+    }
+    console.log(token);
+    const url = 'https://youtube-chat-api.herokuapp.com/users/me/token';
+    axios({
+      url,
+      method: 'delete',
+      headers: {'x-auth': `${token}`}
+    })
+      .then((res) => {
+        dispatch(logoutHandler());
+      })
+      .catch((err) => {
+        dispatch(logoutHandler());
+      });
+  }
 };
 
 export const auth = (username, password, isSignup, display) => {
