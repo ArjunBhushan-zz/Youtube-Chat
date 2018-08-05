@@ -5,6 +5,8 @@ const {ObjectId} = require('mongodb');
 const bcrypt = require ('bcryptjs');
 const {mongoose} = require('./db/mongoose');
 const {User} = require('./models/user');
+const {Room} = require('./models/room');
+const {Message} = require('./models/message');
 const {authenticate} = require('./middleware/authenticate');
 
 const app = express();
@@ -13,107 +15,109 @@ const PORT = process.env.PORT || 6000;
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
-  var time = new Date().toString();
+  const time = new Date().toString();
   console.log(`${req.method} ${req.url} at ${time}`);
   next();
 });
 
-// app.post('/todos', authenticate, (req,res) => {
-//   var todo = new Todo ({
-//     text: req.body.text,
-//     _creator: req.user._id
-//   });
-//
-//   todo.save()
-//     .then((doc) => {
-//       res.status(200).send(doc);
-//     })
-//     .catch((err) => {
-//       res.status(400).send(err);
-//     });
-// });
-//
-// app.get('/todos', authenticate, (req,res) => {
-//   Todo.find({
-//     _creator: req.user._id
-//   }).then((todos) => {
-//       res.status(200).send({todos});
-//     })
-//     .catch((err) => {
-//       res.status(400).send(err);
-//     });
-// });
-//
-// //GET /todos/
-// app.get('/todos/:id', authenticate, (req,res) => {
-//   var id = req.params.id;
-//
-//   if(!ObjectId.isValid(id)){
-//     res.status(404).send();
-//   }else{
-//     Todo.findOne({
-//       _id:id,
-//       _creator: req.user._id
-//     }).then((todo) => {
-//         if(!todo){
-//           res.status(404).send();
-//         }
-//         res.status(200).send({todo});
-//       })
-//       .catch((err) => {
-//         res.status(400).send();
-//       });
-//   }
-// });
-//
-// app.delete('/todos/:id', authenticate,(req, res) => {
-//   var id = req.params.id;
-//   if (!ObjectId.isValid(id)){
-//     res.status(404).send();
-//     return;
-//   }
-//   Todo.findOneAndRemove({
-//     _id: id,
-//     _creator: req.user._id
-//   }).then((todo) => {
-//       if(!todo){
-//         res.status(404).send();
-//         return;
-//       }
-//       res.status(200).send(todo);
-//     })
-//     .catch((err) => {
-//       res.status(400).send();
-//     });
-// });
-//
-// app.patch('/todos/:id', authenticate,(req,res) =>{
-//   var id = req.params.id;
-//   var body = _.pick(req.body, ['text', 'completed']);
-//   if(!ObjectId.isValid(id)){
-//     res.status(404).send();
-//     return;
-//   }
-//
-//   if(_.isBoolean(body.completed) && body.completed){
-//     body.completedAt = new Date().getTime();
-//   }else{
-//     body.completed = false;
-//     body.completedAt = null;
-//   }
-//
-//   Todo.findByIdAndUpdate({_id:id, _creator: req.user._id}, {$set: body}, {new: true})
-//     .then((todo) => {
-//       if(!todo){
-//         res.status(404).send();
-//         return;
-//       }
-//       res.status(200).send({todo});
-//     })
-//     .catch((err) => {
-//       res.status(400).send();
-//     });
-// });
+app.post('/rooms', authenticate, (req,res) => {
+  const body = _.pick(req.body, ['name']);
+  body._owner = req.user._id;
+  const room = new Room(body);
+  room.save()
+    .then((data) => {
+      res.send(data);
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+});
+
+app.get('/rooms', (req,res) => {
+  Room.find({})
+    .then((rooms) => {
+      let pickedRooms = [];
+      rooms.forEach((room) => {
+        pickedRooms.push(_.pick(room, ['name', '_owner']));
+      });
+      res.send(pickedRooms);
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+});
+
+app.get('/rooms/:roomName', authenticate, (req, res) => {
+  const roomName = req.params.roomName;
+  console.log(roomName);
+  Room.findOne({name: roomName})
+    .then((room) => {
+      if (!room) {
+        return res.status(404).send();
+      }
+      res.send(room);
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+});
+
+app.post('/rooms/message/:roomName', authenticate, (req, res) => {
+  const roomName = req.params.roomName;
+  const body = _.pick(req.body, ['text']);
+  body._user = req.user._id;
+  const message = new Message(body);
+  message.save()
+    .then(() => {
+      Room.findOne({name: roomName})
+        .then((room) => {
+          if (!room) {
+            return res.status(404).send();
+          }
+          room.messages = room.messages.concat({_message: message._id});
+          room.save()
+            .then(() => {
+              res.send();
+            })
+            .catch((err) => {
+              res.status(400).send(err);
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+          res.status(400).send(err);
+        });
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+});
+
+app.delete('/rooms/:roomName', authenticate, (req, res) => {
+  const roomName = req.params.roomName;
+  Room.findOne({name: roomName})
+    .then((room) => {
+      if(!room){
+        return res.status(404).send();
+      }
+      if (room._owner.toString() !== req.user._id.toString()) {
+        return res.status(401).send();
+      }
+      Room.findOneAndRemove({name: roomName})
+        .then((room) => {
+          if (!room) {
+            return res.status(404).send();
+          }
+          res.send(room);
+        })
+        .catch((err) => {
+          res.status(400).send(err);
+        });
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    })
+});
 
 
 app.post('/users', (req, res) => {
