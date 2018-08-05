@@ -93,6 +93,37 @@ app.post('/rooms/message/:roomName', authenticate, (req, res) => {
     });
 });
 
+app.post('/rooms/user/:roomName', authenticate, (req, res) => {
+  const roomName = req.params.roomName;
+  Room.findOne({name: roomName})
+    .then((room) => {
+      if (!room) {
+        res.status(404).send();
+      }
+      let unique = true;
+      room.visitedUsers.forEach((user) => {
+        if (user._user.toString() === req.user.id.toString()) {
+          unique = false;
+        }
+      });
+      if (unique) {
+        room.visitedUsers = room.visitedUsers.concat({_user: req.user.id});
+        room.save()
+          .then(() => {
+            res.send();
+          })
+          .catch((err) => {
+            res.status(400).send();
+          });
+      }else{
+        res.send();
+      }
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    })
+});
+
 app.delete('/rooms/:roomName', authenticate, (req, res) => {
   const roomName = req.params.roomName;
   Room.findOne({name: roomName})
