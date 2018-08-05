@@ -15,6 +15,12 @@ const UserSchema = new mongoose.Schema (
       minlength: 1,
       unique: true,
     },
+    display: {
+      required: false,
+      trim: true,
+      type: String,
+      minlength: 1
+    },
     password: {
       type: String,
       require: true,
@@ -27,7 +33,7 @@ const UserSchema = new mongoose.Schema (
       }
     }],
     visitedRooms : [{
-      _visitor: {
+      _visited: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
       }
@@ -51,7 +57,7 @@ UserSchema.methods.generateAuthToken = function () {
 UserSchema.methods.toJSON = function () {
   var user = this;
   var userObject = user.toObject();
-  return _.pick(userObject, ['_id', 'username']);
+  return _.pick(userObject, ['_id', 'username', 'visitedRooms', 'display']);
 };
 
 UserSchema.methods.removeToken = function(token) {

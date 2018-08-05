@@ -3,17 +3,14 @@ const socketIO = require ('socket.io');
 const express = require ('express');
 
 const PORT = process.env.PORT || 8080;
-
+const {Users} = require('./utils/Users');
+const {Rooms} = require('./utils/Rooms');
 const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
-// {
-//   username:,
-//   rooms: [ , , , , ,],
-//   latency: []
-// }
-const users = [];
+let users = new Users();
+let rooms = new Rooms();
 
 io.on('connection', (socket) => {
   console.log(`[Socket]: New user entered.`);

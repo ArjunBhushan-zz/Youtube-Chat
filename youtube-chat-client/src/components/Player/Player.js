@@ -32,6 +32,7 @@ class Player extends Component {
     socket.emit('join', this.state.user);
 
     socket.on('timeSync', (newTime) => {
+      console.log(newTime);
       if (!this.state.videoPaused){
         this.player.seekTo(newTime);
       }

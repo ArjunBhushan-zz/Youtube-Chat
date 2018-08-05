@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
-var Todo = mongoose.model('Todo', {
-  text: {
+var Todo = mongoose.model('Room', {
+  name: {
     type: String,
     required: true,
     minlength: 1,
@@ -15,7 +15,7 @@ var Todo = mongoose.model('Todo', {
     type: Number,
     default: null
   },
-  _creator: {
+  _owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true
   }
