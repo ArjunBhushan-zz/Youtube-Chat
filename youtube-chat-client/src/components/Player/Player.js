@@ -5,7 +5,8 @@ import windowSize from 'react-window-size';
 import Button from './../UI/Button/Button';
 import Input from './../UI/Input/Input';
 import io from 'socket.io-client';
-
+import { connect } from 'react-redux';
+import axios from 'axios';
 
 class Player extends Component {
   state = {
@@ -16,8 +17,8 @@ class Player extends Component {
     roomOwner: false,
     videoPaused: false,
     user: {
-      username: 'Arjun',
-      room: 'Room_Id',
+      username: this.props.username || localStorage.getItem('username'),
+      room: this.props.room,
     }
   }
   componentDidUpdate(prevProps, prevState){
@@ -27,12 +28,32 @@ class Player extends Component {
     }
   }
   componentDidMount () {
+    //checkOwnership if fails for any reason, assumes you are not/incapable of being one
+    axios({
+      method: 'get',
+      url: `https://youtube-chat-api.herokuapp.com/rooms/${this.state.user.room}`,
+      headers: {
+        'x-auth': this.props.token || localStorage.getItem('token')
+      }
+    })
+      .then((owner) => {
+        axios({
+          method: 'get',
+          url: `https://youtube-chat-api.herokuapp.com/users/me`,
+          headers: {
+            'x-auth': this.props.token || localStorage.getItem('token')
+          }
+        })
+          .then((user) => {
+            if (owner.data._owner === user.data._id) {
+              this.setState({roomOwner: true});
+            }
+          });
+      });
     const socket = io('http://localhost:8080');
     this.socket = socket;
     socket.emit('join', this.state.user);
-
     socket.on('timeSync', (newTime) => {
-      console.log(newTime);
       if (!this.state.videoPaused){
         this.player.seekTo(newTime);
       }
@@ -51,7 +72,7 @@ class Player extends Component {
           urlValid: false
         }
       );
-    })
+    });
     // socket.on('timeSync', ())
   }
   componentWillUnmount() {
@@ -87,8 +108,7 @@ class Player extends Component {
           playingUrl: this.state.currentUrl,
           currentUrl: '',
           urlTouched: false,
-          urlValid: false,
-          roomOwner: true
+          urlValid: false
         }
       );
       this.socket.emit('urlChange', this.state.user, this.state.currentUrl);
@@ -102,34 +122,28 @@ class Player extends Component {
       this.setState({currentUrl: e.target.value, urlTouched: true});
     }
   }
-  changeRoom = () => {
-    this.setState({
-      user: {
-        ...this.state.user,
-        room: 'Different_Room'
-      }
-    });
-  }
   render() {
+    const form = (
+      <form onSubmit = {(e) => this.onUpdateUrlHandler(e)}>
+        <div className = {styles.Form}>
+          <Input
+            elementType = 'input'
+            value = {this.state.currentUrl}
+            elementConfig = {{
+              type: 'text',
+              placeholder: 'Video URL'
+            }}
+            invalid = {!this.state.urlValid}
+            touched = {this.state.urlTouched}
+            changed = {(e) => this.onURLChanged(e)}
+          />
+          <Button buttonType = 'Danger'>Change URL</Button>
+        </div>
+      </form>
+    );
     return (
       <div>
-        <form onSubmit = {(e) => this.onUpdateUrlHandler(e)}>
-          <div className = {styles.Form}>
-            <Input
-              elementType = 'input'
-              value = {this.state.currentUrl}
-              elementConfig = {{
-                type: 'text',
-                placeholder: 'Video URL'
-              }}
-              invalid = {!this.state.urlValid}
-              touched = {this.state.urlTouched}
-              changed = {(e) => this.onURLChanged(e)}
-            />
-            <Button buttonType = 'Danger'>Change URL</Button>
-          </div>
-        </form>
-
+        {this.state.roomOwner ? form : null}
         <ReactPlayer
           ref = {this.ref}
           className = {styles.Player}
@@ -142,9 +156,15 @@ class Player extends Component {
           onProgress = {this.onProgressHandler}
           onPause = {this.onPauseHandler}
           onPlay = {this.onPlayHandler}/>
-        <p onClick = {this.changeRoom}>Change Room</p>
       </div>
     );
   }
 }
-export default windowSize(Player);
+
+const mapStateToProps = (state) => {
+  return {
+    username: state.auth.username,
+    token: state.auth.token
+  };
+};
+export default connect(mapStateToProps)(windowSize(Player));

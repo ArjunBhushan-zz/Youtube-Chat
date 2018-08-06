@@ -1,0 +1,13 @@
+.NewRoom button {
+  display: none;
+}
+
+.Error {
+  font-weight: bold;
+  color: red;
+  font-size: 20px;
+  border: 2px dotted red;
+  margin: 10px auto;
+  padding: 5px;
+  width: 60%;
+}

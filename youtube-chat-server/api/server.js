@@ -39,7 +39,7 @@ app.get('/rooms', (req,res) => {
     .then((rooms) => {
       let pickedRooms = [];
       rooms.forEach((room) => {
-        pickedRooms.push(_.pick(room, ['name', '_owner']));
+        pickedRooms.push(_.pick(room, ['name', '_owner', '_id']));
       });
       res.send(pickedRooms);
     })
@@ -48,7 +48,7 @@ app.get('/rooms', (req,res) => {
     });
 });
 
-app.get('/rooms/:roomName', authenticate, (req, res) => {
+app.get('/rooms/:roomName', (req, res) => {
   const roomName = req.params.roomName;
   Room.findOne({name: roomName})
     .then((room) => {

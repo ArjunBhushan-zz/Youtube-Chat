@@ -6,6 +6,7 @@ import VideoChat from './containers/VideoChat/VideoChat';
 import Auth from './containers/Auth/Auth';
 import Home from './containers/Home/Home';
 import Logout from './containers/Auth/Logout/Logout';
+import Me from './containers/Me/Me';
 import { connect } from 'react-redux';
 import * as actions from './store/actions/index';
 
@@ -18,6 +19,7 @@ class App extends Component {
       <Switch>
         <Route path = "/auth" component = {Auth}/>
         <Route path= "/rooms" component={VideoChat}/>
+        <Route path= "/me" component = {Me}/>
         <Route path= "/logout" component={Logout}/>
         <Route path = "/" exact component = {Home}/>
         <Redirect to = '/'/>

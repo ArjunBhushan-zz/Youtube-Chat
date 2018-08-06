@@ -23,6 +23,8 @@ const authFail = (error) => {
 
 const processError = (error) => {
   if (error.response.status === 404) {
+    return `Credentials Not Found`;
+  }else if (error.response.status === 401) {
     return `Unauthorized Credentials`;
   }else {
     return `Unexpected Error`
@@ -30,8 +32,8 @@ const processError = (error) => {
 };
 
 const logoutHandler = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('username');
+  //localStorage.removeItem('token');
+  //localStorage.removeItem('username');
   return {
       type: actionTypes.AUTH_LOGOUT
   };
@@ -39,11 +41,11 @@ const logoutHandler = () => {
 
 export const logout = () => {
   return (dispatch) => {
-    const token = localStorage.getItem('token');
+    let token;
+    //const token = localStorage.getItem('token');
     if (!token){
       return dispatch(logoutHandler());
     }
-    console.log(token);
     const url = 'https://youtube-chat-api.herokuapp.com/users/me/token';
     axios({
       url,
@@ -72,8 +74,8 @@ export const auth = (username, password, isSignup, display) => {
         .then((res) => {
           const token = res.data.token;
           const username = res.data.username;
-          localStorage.setItem('token', token);
-          localStorage.setItem('username', username);
+          //localStorage.setItem('token', token);
+          //localStorage.setItem('username', username);
           dispatch(authSuccess(token, username));
         })
         .catch((err) => {
@@ -88,8 +90,8 @@ export const auth = (username, password, isSignup, display) => {
         .then((res) => {
           const token = res.data.token;
           const username = res.data.username;
-          localStorage.setItem('token', token);
-          localStorage.setItem('username', username);
+          //localStorage.setItem('token', token);
+          //localStorage.setItem('username', username);
           dispatch(authSuccess(token, username));
         })
         .catch((err) => {
@@ -101,11 +103,13 @@ export const auth = (username, password, isSignup, display) => {
 
 export const authCheckState = () => {
   return (dispatch) => {
-    const token = localStorage.getItem('token');
+    let token;
+    //const token = localStorage.getItem('token');
     if (!token) {
       dispatch(logout());
     } else {
-      const username = localStorage.getItem('username');
+      let username;
+      //const username = localStorage.getItem('username');
       dispatch(authSuccess(token, username));
     }
   };

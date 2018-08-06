@@ -1,0 +1,33 @@
+.Me {
+  margin: 20px auto;
+  width: 80%;
+  text-align: center;
+  box-shadow: 0 2px 3px #ccc;
+  border: 1px solid #eee;
+  padding: 10px;
+  box-sizing: border-box;
+  display: block;
+}
+
+.Error {
+  font-weight: bold;
+  color: red;
+  font-size: 20px;
+  border: 2px dotted red;
+  margin: 10px auto;
+  padding: 5px;
+  width: 60%;
+}
+
+.Me button {
+  display: none;
+}
+
+.Me hr {
+  margin: 40px 0px;
+}
+@media (min-width: 600px){
+  .Me {
+    width: 500px;
+  }
+}
