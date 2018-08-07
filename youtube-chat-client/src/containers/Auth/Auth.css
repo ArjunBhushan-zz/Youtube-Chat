@@ -28,6 +28,9 @@
   width: 60%;
 }
 
+button {
+  display: inline-block; 
+}
 @media (min-width: 600px){
   .Auth {
     width: 500px;

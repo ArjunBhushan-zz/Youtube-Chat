@@ -6,20 +6,46 @@ import Button from './../UI/Button/Button';
 import Input from './../UI/Input/Input';
 import io from 'socket.io-client';
 import { connect } from 'react-redux';
+import Auxiliary from './../../hoc/Auxiliary/Auxiliary';
 import axios from 'axios';
+import { withRouter } from 'react-router-dom';
+
+const getAverage = (array) => {
+  let averageLatency = 0;
+  let length = array.length;
+  if (length < 5){
+    for (let i=0; i<length; i++){
+      averageLatency = averageLatency + array[i];
+      if (i === length - 1){
+        averageLatency = averageLatency/length;
+        return averageLatency;
+      }
+    }
+  }else{
+    for (let i=length-5; i<length; i++){
+      averageLatency = averageLatency + array[i];
+      if (i === length - 1){
+        averageLatency = averageLatency/5;
+        return averageLatency;
+      }
+    }
+  }
+  return 0;
+};
 
 class Player extends Component {
   state = {
     currentUrl:'',
     urlTouched: false,
     urlValid: false,
-    playingUrl: 'https://www.youtube.com/watch?v=O_VxJn9U_O0?vq=small',
+    playingUrl: 'https://www.youtube.com/watch?v=ct8In_FAvZE',
     roomOwner: false,
     videoPaused: false,
     user: {
       username: this.props.username || localStorage.getItem('username'),
       room: this.props.room,
-    }
+    },
+    error: null
   }
   componentDidUpdate(prevProps, prevState){
     if (prevState.user.room !== this.state.user.room) {
@@ -47,15 +73,22 @@ class Player extends Component {
           .then((user) => {
             if (owner.data._owner === user.data._id) {
               this.setState({roomOwner: true});
+              this.socket.emit('urlChange', this.state.user, this.state.playingUrl);
             }
           });
       });
     const socket = io('http://localhost:8080');
     this.socket = socket;
     socket.emit('join', this.state.user);
-    socket.on('timeSync', (newTime) => {
+    socket.on('timeSync', (newTime, sockets) => {
       if (!this.state.videoPaused){
-        this.player.seekTo(newTime);
+        let clientLatency = 0;
+        for (let i=0; i<sockets.length; i++){
+          if (sockets[i].socketId === socket.id){
+            clientLatency = getAverage(sockets[i].latency);
+          }
+        }
+        this.player.seekTo(newTime + (clientLatency/2)/1000);
       }
     });
     socket.on('pauseVideo', () => {
@@ -73,10 +106,16 @@ class Player extends Component {
         }
       );
     });
-    // socket.on('timeSync', ())
+    socket.on('roomDisbanded', () => {
+      this.props.history.push('/');
+    });
+    socket.on('setLatency', (cb) => {
+      cb();
+    });
   }
   componentWillUnmount() {
-    this.socket.close();
+    this.socket.emit('unsubscribe', this.state.user);
+    this.socket.close(this.state.user);
   }
   validateUrl = (url) => {
     return ReactPlayer.canPlay(url);
@@ -85,6 +124,7 @@ class Player extends Component {
     this.player = player
   }
   onProgressHandler = (progress) => {
+    this.socket.emit('updateLatency', this.state.user);
     if (this.state.roomOwner && !this.state.videoPaused) {
       this.socket.emit('timeChange', this.state.user, progress.playedSeconds);
     }
@@ -122,27 +162,52 @@ class Player extends Component {
       this.setState({currentUrl: e.target.value, urlTouched: true});
     }
   }
+  deleteRoomHandler = () => {
+    axios({
+      method: 'delete',
+      headers: {'x-auth': this.props.token},
+      url: `https://youtube-chat-api.herokuapp.com/rooms/${this.state.user.room}`
+    })
+      .then((res) => {
+        this.socket.emit('roomDeleted', this.state.user);
+        this.props.history.push('/');
+      })
+      .catch((err) => {
+        this.setState({error: 'Could not delete room'});
+      });
+  }
   render() {
     const form = (
-      <form onSubmit = {(e) => this.onUpdateUrlHandler(e)}>
-        <div className = {styles.Form}>
-          <Input
-            elementType = 'input'
-            value = {this.state.currentUrl}
-            elementConfig = {{
-              type: 'text',
-              placeholder: 'Video URL'
-            }}
-            invalid = {!this.state.urlValid}
-            touched = {this.state.urlTouched}
-            changed = {(e) => this.onURLChanged(e)}
-          />
-          <Button buttonType = 'Danger'>Change URL</Button>
-        </div>
-      </form>
+      <div className = {styles.Url}>
+        <form onSubmit = {(e) => this.onUpdateUrlHandler(e)}>
+          <div className>
+            <Input
+              elementType = 'input'
+              value = {this.state.currentUrl}
+              elementConfig = {{
+                type: 'text',
+                placeholder: 'Video URL'
+              }}
+              invalid = {!this.state.urlValid}
+              touched = {this.state.urlTouched}
+              changed = {(e) => this.onURLChanged(e)}
+            />
+          </div>
+        </form>
+      </div>
     );
+    const deleteButton = (
+      <div className = {styles.Button}>
+        <Button buttonType = 'Danger' clicked= {this.deleteRoomHandler}>DELETE ROOM</Button>
+      </div>
+    );
+    let error = null;
+    if (this.state.error) {
+      error = (<p className = {styles.Error}> {this.state.error}</p>);
+    }
     return (
-      <div>
+      <Auxiliary>
+        {error}
         {this.state.roomOwner ? form : null}
         <ReactPlayer
           ref = {this.ref}
@@ -156,7 +221,8 @@ class Player extends Component {
           onProgress = {this.onProgressHandler}
           onPause = {this.onPauseHandler}
           onPlay = {this.onPlayHandler}/>
-      </div>
+        {this.state.roomOwner ? deleteButton : null}
+      </Auxiliary>
     );
   }
 }
@@ -167,4 +233,4 @@ const mapStateToProps = (state) => {
     token: state.auth.token
   };
 };
-export default connect(mapStateToProps)(windowSize(Player));
+export default withRouter(connect(mapStateToProps)(windowSize(Player)));

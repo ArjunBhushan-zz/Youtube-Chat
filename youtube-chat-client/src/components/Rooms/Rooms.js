@@ -9,7 +9,6 @@ const rooms = (props) => {
   });
   return (
     <div className = {styles.Rooms}>
-      <h2>Owned Rooms</h2>
       {rooms}
     </div>
   );

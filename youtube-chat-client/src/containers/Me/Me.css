@@ -19,6 +19,18 @@
   width: 60%;
 }
 
+.Me a {
+  width: 50%;
+  display: block;
+  margin: 5px auto;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 5px;
+  border: 2px solid red;
+  text-decoration: none;
+  color: black;
+}
+
 .Me button {
   display: none;
 }

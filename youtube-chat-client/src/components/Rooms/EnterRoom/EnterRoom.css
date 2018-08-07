@@ -1,0 +1,25 @@
+.EnterRoom {
+  width:80%;
+  display: flex;
+  margin: auto;
+  justify-content: center;
+  align-items: flex-end;
+  align-content: stretch;
+}
+.EnterRoom h2 {
+  align-self: flex-end;
+}
+
+.EnterRoom button {
+  display: none;
+}
+
+.Error {
+  font-weight: bold;
+  color: red;
+  font-size: 20px;
+  border: 2px dotted red;
+  margin: 10px auto;
+  padding: 5px;
+  width: 60%;
+}

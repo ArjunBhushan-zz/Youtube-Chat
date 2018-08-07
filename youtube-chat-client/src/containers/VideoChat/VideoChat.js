@@ -3,6 +3,7 @@ import Player from './../../components/Player/Player';
 import { withRouter, Redirect } from 'react-router-dom';
 import queryString from 'query-string';
 import axios from 'axios';
+import Chat from './../../components/Chat/Chat';
 import { connect } from 'react-redux';
 
 class VideoChat extends Component {
@@ -27,9 +28,14 @@ class VideoChat extends Component {
     if (!room) {
       sockets = <Redirect to= "/"/>;
     }
+    let chat = (
+      <Chat room = {room}/>
+    );
+
     return (
       <div>
         {sockets}
+        {chat}
       </div>
     );
   }

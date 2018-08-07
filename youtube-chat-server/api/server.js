@@ -62,6 +62,28 @@ app.get('/rooms/:roomName', (req, res) => {
     });
 });
 
+app.get('/users/user/:id', (req,res) => {
+  const userId = req.params.id;
+  User.findById(userId)
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      res.status(404).send();
+    });
+});
+
+app.get('/messages/:id', (req,res) => {
+  const messageId = req.params.id;
+  Message.findById(messageId)
+    .then((message) => {
+      res.send(message);
+    })
+    .catch((err) => {
+      res.status(404).send();
+    });
+});
+
 app.post('/rooms/message/:roomName', authenticate, (req, res) => {
   const roomName = req.params.roomName;
   const body = _.pick(req.body, ['text']);

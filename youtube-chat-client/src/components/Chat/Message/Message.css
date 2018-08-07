@@ -1,0 +1,21 @@
+.Message {
+  padding: 10px;
+  border: 1px solid black;
+  margin: 10px;
+}
+
+.Title {
+  display: flex;
+  margin: 0px;
+  height: 15px;
+  align-items: center;
+}
+
+.Title h4 {
+  margin-right: 10px;
+}
+
+.Body {
+  width: 100%;
+  text-align: left;
+}

@@ -7,9 +7,28 @@
   grid-template-columns: 70% 30%;
 }
 
+.Button {
+  display: flex;
+  justify-content: center;
+}
 .Form input {
   border: 2px solid black;
 }
 .Form button {
   text-align: left;
+}
+
+.Url {
+  box-sizing: border-box;
+  width: 80%;
+  margin: auto;
+}
+.Error {
+  font-weight: bold;
+  color: red;
+  font-size: 20px;
+  border: 2px dotted red;
+  margin: 10px auto;
+  padding: 5px;
+  width: 60%;
 }

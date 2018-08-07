@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
-import styles from './NewRoom.css';
+import styles from './EnterRoom.css';
 import Input from './../../../components/UI/Input/Input';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import axios from 'axios';
 
-class NewRoom extends Component {
+class EnterRoom extends Component {
   state = {
     controls: {
       room: {
@@ -53,35 +52,7 @@ class NewRoom extends Component {
   }
   submitHandler = (e) => {
     e.preventDefault();
-    axios({
-      method: 'post',
-      url: 'https://youtube-chat-api.herokuapp.com/rooms',
-      data: {
-        name: this.state.controls.room.value.trim().toLowerCase()
-      },
-      headers: {'x-auth': `${this.props.token.toString()}`}
-    })
-      .then((room) => {
-        axios({
-          method: 'patch',
-          url: 'https://youtube-chat-api.herokuapp.com/users/me/',
-          data: {
-            visitedRoom: {
-              _visited: room.data._id
-            }
-          },
-          headers: {'x-auth': `${this.props.token.toString()}`}
-        })
-          .then((user) => {
-            this.props.history.push(`/rooms?room=${this.state.controls.room.value.trim().toLowerCase()}`);
-          })
-          .catch((err) => {
-            this.setState({error: 'An error has occured or that room may already exist.'})
-          })
-      })
-      .catch((err) => {
-        this.setState({error: 'An error has occured or that room may already exist.'})
-      });
+    this.props.history.push(`/rooms?room=${this.state.controls.room.value.trim().toLowerCase()}`);
   }
   render() {
     const formElementsArray = [];
@@ -109,8 +80,7 @@ class NewRoom extends Component {
       error = (<p className = {styles.Error}> {this.state.error}</p>);
     }
     return (
-      <div className = {styles.NewRoom}>
-        <h2>Create Room</h2>
+      <div className = {styles.EnterRoom}>
         {error}
         <form onSubmit= {this.state.controls.room.value.trim().length ? (event) => this.submitHandler(event) : (event) => event.preventDefault()}>
           {form}
@@ -128,4 +98,4 @@ const mapStateToProps = (state) => {
 };
 
 
-export default withRouter(connect(mapStateToProps)(NewRoom));
+export default withRouter(connect(mapStateToProps)(EnterRoom));

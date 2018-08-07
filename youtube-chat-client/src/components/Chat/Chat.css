@@ -1,0 +1,46 @@
+.Chat {
+  margin: auto;
+  text-align: center;
+}
+
+.Header {
+  margin: 20px auto 0px;
+  width: 80%;
+  background-color: #FF333C;
+  display: flex;
+  justify-content: space-between;
+  color: white;
+  text-shadow: 0 0 2px black;
+}
+
+.Header h1 {
+  padding-left: 10px;
+}
+
+.Header img {
+  width: 5%;
+  height: 25%;
+  padding: 10px;
+}
+
+.Body {
+  box-sizing: border-box;
+  width: 80%;
+  margin: auto;
+  border: 2px solid #FF333C;
+}
+
+.Footer {
+  width: 80%;
+  box-sizing: border-box;
+  margin: auto;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  padding: 0px;
+  border: 2px solid #FF333C;
+  border-top: none;
+}
+
+button {
+  display: none;
+}

@@ -67,7 +67,7 @@ class Auth extends Component {
       isValid = isValid && (value.trim().length >= rules.minLength);
     }
     return isValid;
-  };
+  }
 
   inputChangedHandler = (id, event) => {
     const updatedControls = {
@@ -128,7 +128,7 @@ class Auth extends Component {
     }
     return (
       <div className = {styles.Auth}>
-        {this.props.isAuth ? <Redirect to ="/"/> : null}
+        {this.props.isAuth ? <Redirect to="/me"/> : null}
         <form onSubmit= {(event) => this.submitHandler(event)}>
           {this.props.error ? <p className = {styles.Error}>{this.props.error}</p> : null}
           {form}
@@ -144,7 +144,7 @@ const mapStateToProps = (state) => {
   return {
     loading: state.auth.loading,
     error: state.auth.error,
-    isAuth: state.auth.token !== null
+    isAuth: state.auth.token
   };
 };
 

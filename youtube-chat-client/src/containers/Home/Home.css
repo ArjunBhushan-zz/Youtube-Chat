@@ -1,0 +1,38 @@
+.Home {
+  width: 80%;
+  border: 3px solid red;
+  margin: auto;
+  text-align: center;
+  border-radius: 10px;
+}
+
+.Home a {
+  display: inline-block;
+  text-align: left;
+  padding: 5px;
+  font-size: 15px;
+  font-weight: bold;
+  border-radius: 5px;
+  text-decoration: none;
+  color: black;
+  font-size: 16px;
+  border: 2px solid black;
+  margin: 10px;
+}
+
+.Home h4 {
+    margin: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0px;
+}
+
+.Error {
+  font-weight: bold;
+  color: red;
+  font-size: 20px;
+  border: 2px dotted red;
+  margin: 10px auto;
+  padding: 5px;
+  width: 60%;
+}

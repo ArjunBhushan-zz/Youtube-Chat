@@ -131,7 +131,8 @@ class Me extends Component {
           <button/>
         </form>
         <hr/>
-        <Rooms rooms = {this.props.rooms}/>
+        <h2>Owned Rooms</h2>
+        <Rooms rooms = {this.props.rooms} className = {styles.OwnedRooms}/>
         <hr/>
         <NewRoom/>
       </div>
