@@ -1,14 +1,13 @@
 import React, {Component} from 'react';
 import Player from './../../components/Player/Player';
 import { withRouter, Redirect } from 'react-router-dom';
-import queryString from 'query-string';
 import axios from 'axios';
 import Chat from './../../components/Chat/Chat';
 import { connect } from 'react-redux';
 
 class VideoChat extends Component {
   componentDidMount() {
-    const room = queryString.parse(this.props.location.search).room;
+    const room = this.props.location.search.slice(6);
     axios({
       method: 'get',
       url: `https://youtube-chat-api.herokuapp.com/rooms/${room}`,
@@ -21,7 +20,7 @@ class VideoChat extends Component {
       });
   }
   render() {
-    const room = queryString.parse(this.props.location.search).room;
+    const room = this.props.location.search.slice(6);
     let sockets = (
       <Player room = {room}/>
     );

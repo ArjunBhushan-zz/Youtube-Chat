@@ -38,7 +38,7 @@ class Player extends Component {
     currentUrl:'',
     urlTouched: false,
     urlValid: false,
-    playingUrl: 'https://www.youtube.com/watch?v=ct8In_FAvZE',
+    playingUrl: 'https://www.youtube.com/watch?v=2YBtspm8j8M',
     roomOwner: false,
     videoPaused: false,
     user: {
@@ -77,7 +77,7 @@ class Player extends Component {
             }
           });
       });
-    const socket = io('http://localhost:8080');
+    const socket = io('https://youtube-chat-socket.herokuapp.com/');
     this.socket = socket;
     socket.emit('join', this.state.user);
     socket.on('timeSync', (newTime, sockets) => {
