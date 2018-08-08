@@ -47,12 +47,6 @@ class Player extends Component {
     },
     error: null
   }
-  componentDidUpdate(prevProps, prevState){
-    if (prevState.user.room !== this.state.user.room) {
-      this.socket.emit('join', this.state.user);
-      this.socket.emit('unsubscribe', prevState.user);
-    }
-  }
   componentDidMount () {
     //checkOwnership if fails for any reason, assumes you are not/incapable of being one
     axios({
@@ -79,7 +73,9 @@ class Player extends Component {
       });
     const socket = io('https://youtube-chat-socket.herokuapp.com/');
     this.socket = socket;
-    socket.emit('join', this.state.user);
+    socket.on('connect', () => {
+      socket.emit('join', this.state.user);
+    });
     socket.on('timeSync', (newTime, sockets) => {
       if (!this.state.videoPaused){
         let clientLatency = 0;
@@ -180,7 +176,7 @@ class Player extends Component {
     const form = (
       <div className = {styles.Url}>
         <form onSubmit = {(e) => this.onUpdateUrlHandler(e)}>
-          <div className>
+          <div>
             <Input
               elementType = 'input'
               value = {this.state.currentUrl}

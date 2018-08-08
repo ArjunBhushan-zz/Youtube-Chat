@@ -6,20 +6,6 @@
   border-radius: 10px;
 }
 
-.Home a {
-  display: inline-block;
-  text-align: left;
-  padding: 5px;
-  font-size: 15px;
-  font-weight: bold;
-  border-radius: 5px;
-  text-decoration: none;
-  color: black;
-  font-size: 16px;
-  border: 2px solid black;
-  margin: 10px;
-}
-
 .Home h4 {
     margin: 0px;
     margin-top: 10px;

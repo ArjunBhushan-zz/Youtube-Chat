@@ -28,6 +28,37 @@
   width: 80%;
   margin: auto;
   border: 2px solid #FF333C;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.Users {
+  box-sizing: border-box;
+  width: 80%;
+  margin: auto;
+  border: 2px solid #FF333C;
+  border-top: none;
+  border-bottom: none;
+  margin-top: none;
+  margin-bottom: none;
+  padding-top:none;
+  padding-bottom:none;
+  display: flex;
+  flex-wrap: warp;
+  justify-content: center;
+}
+
+.Users p {
+  margin-top: none;
+  margin-bottom: none;
+  padding-top:none;
+  padding-bottom:none;
+  padding: 15px;
+  margin: 10px;
+  color: green;
+  border: 1px solid green;
+  font-size: 15px;
+  font-weight: solid;
 }
 
 .Footer {

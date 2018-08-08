@@ -16,9 +16,8 @@ let getLatency = [];
 
 io.on('connection', (socket) => {
   socket.on('join', (user) => {
-    //console.log(`[Socket]: ${user.username} has joined ${user.room}`);
     socket.join(user.room);
-    sockets.addSocket(socket.id, user.username);
+    sockets.addSocket(socket.id, user.username, user.room);
     if(rooms.isRoom(user.room) === -1){
       rooms.addRoom(user.room);
       rooms.addUser(user.username, user.room);
@@ -28,39 +27,39 @@ io.on('connection', (socket) => {
       }
       rooms.addUser(user.username, user.room);
     }
+    io.emit('getRooms', rooms.rooms);
   });
 
   socket.on('unsubscribe', (user) => {
-    //console.log(`[Socket]: ${user.username} has left ${user.room}`);
     rooms.removeUser(user.username, user.room);
     sockets.removeSocketById(socket.id);
     if (getLatency.indexOf(socket.id) !== -1) {
       getLatency.splice(getLatency.indexOf(socket.id), 1);
     }
-    if (rooms.isRoom(user.room) !== -1) {
-      if (rooms.rooms[rooms.isRoom(user.room)].users.length === 0){
-        rooms.removeRoom(user.room);
-      }
-    }
+    io.emit('getRooms', rooms.rooms);
     socket.leave(user.room);
   });
   socket.on('disconnect', () => {
     let username = sockets.getUsername(socket.id);
-    // rooms.removeUser(username, user.room);
+    let room = null;
+    if (sockets.isSocketById(socket.id) !== -1){
+      room = sockets.sockets[sockets.isSocketById(socket.id)].room
+    }
+    if (username && room){
+      rooms.removeUser(username, room);
+    }
     sockets.removeSocketById(socket.id);
     if (getLatency.indexOf(socket.id) !== -1) {
       getLatency.splice(getLatency.indexOf(socket.id), 1);
     }
-    // if (rooms.isRoom(user.room) !== -1) {
-    //   if (rooms.rooms[rooms.isRoom(user.room)].users.length === 0){
-    //     rooms.removeRoom(user.room);
-    //   }
-    // }
-    // socket.leave(user.room);
+    io.emit('getRooms', rooms.rooms);
+    socket.leave(room);
   });
 
   socket.on('roomDeleted', (user) => {
+    rooms.removeRoom(user.room);
     socket.broadcast.to(user.room).emit('roomDisbanded');
+    io.emit('getRooms', rooms.rooms);
   });
 
   socket.on('timeChange', (user, currTime) => {
@@ -82,7 +81,7 @@ io.on('connection', (socket) => {
     if (getLatency.indexOf(socket.id) !== -1){
       let currentTime = Date.now();
       socket.emit('setLatency', () => {
-        sockets.updateLatency(user.username,(Date.now() - currentTime)/2);
+        sockets.updateLatency(user.username, user.room, (Date.now() - currentTime)/2);
       });
     }
   });
@@ -91,7 +90,6 @@ io.on('connection', (socket) => {
     if (rooms.rooms[rooms.isRoom(user.room)]){
       rooms.rooms[rooms.isRoom(user.room)].url = newUrl;
     }
-    console.log(rooms);
     //console.log(`[Socket]: URL has changed to ${newUrl}`);
     socket.broadcast.to(user.room).emit('pauseVideo');
     socket.broadcast.to(user.room).emit('urlSync', newUrl);
@@ -127,6 +125,9 @@ io.on('connection', (socket) => {
           console.log(err);
         });
     }
+  });
+  socket.on('sendRooms', () => {
+    io.emit('getRooms', rooms.rooms);
   });
 });
 

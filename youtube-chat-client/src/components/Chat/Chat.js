@@ -33,7 +33,8 @@ class Chat extends Component {
         valid: false,
         touched: false
       }
-    }
+    },
+    currentUsers: []
   }
 
   checkValidity = (value, rules) => {
@@ -63,18 +64,18 @@ class Chat extends Component {
     this.setState({controls: updatedControls});
   }
 
-  componentDidUpdate(prevProps, prevState){
-    if (prevState.user.room !== this.state.user.room) {
-      this.socket.emit('join', this.state.user);
-      this.socket.emit('unsubscribe', prevState.user);
-    }
-  }
   componentDidMount () {
     //get all previous in messages the room
     const socket = io('https://youtube-chat-socket.herokuapp.com/');
     this.socket = socket;
-    socket.emit('join', this.state.user);
+    socket.on('connect', () => {
+      socket.emit('join', this.state.user);
+      socket.emit('sendRooms');
+    });
     socket.on('newMessage', (message) => {
+      if (!message.display){
+        message.display = this.state.user.username;
+      }
       this.setState({
         messages: this.state.messages.concat(message),
         controls: {
@@ -86,9 +87,26 @@ class Chat extends Component {
         }
       });
     });
+    socket.on('getRooms', (rooms) => {
+      if (!rooms) {
+        return;
+      }
+      rooms.forEach((room) => {
+        if (room.name === this.props.room) {
+          let currentUsers = [];
+          room.users.forEach((user, index) => {
+            if (user && currentUsers.indexOf(user) === -1){
+              currentUsers.push(user);
+            }
+          });
+          this.setState({currentUsers})
+        }
+      });
+    });
   }
   componentWillUnmount() {
     this.socket.emit('unsubscribe', this.state.user);
+    this.socket.emit('sendRooms');
     this.socket.close(this.state.user);
   }
   onShowComments = () => {
@@ -127,8 +145,14 @@ class Chat extends Component {
             Promise.all(displayPromises)
               .then((displays) => {
                 displays.forEach((display,index) => {
+                  if(!display.data.display) {
+                    display.data.display = display.data.username;
+                  }
                   roomMessages[index].display = display.data.display;
                 });
+                this.scrollToBottom = () => {
+                  this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+                }
                 this.setState({messages: roomMessages, showMessages: true});
               })
               .catch((err) => {
@@ -163,6 +187,13 @@ class Chat extends Component {
       this.socket.emit('createMessage', this.state.user, this.state.user.display, this.state.controls.message.value);
     }
   }
+
+  componentDidUpdate(){
+    if (this.state.showMessages){
+      this.scrollToBottom();
+    }
+  }
+
   render(){
     const formElementsArray = [];
     for (let key in this.state.controls){
@@ -198,8 +229,14 @@ class Chat extends Component {
       <div className = {styles.Footer}>
         <form onSubmit = {this.newMessageHandler}>
           {form}
-          <button/>
         </form>
+      </div>
+    );
+    let users = (
+      <div className = {styles.Users}>
+        {this.state.currentUsers.map((user) => {
+          return <p key = {user}>{user}</p>
+        })}
       </div>
     );
     return(
@@ -208,8 +245,12 @@ class Chat extends Component {
           <h1>Chat Room</h1>
           {this.state.showMessages ? <img  src={collapseArrow} alt="collapseArrow"/> : <img  src={expandArrow} alt="expandArrow"/>}
         </div>
+        {this.state.showMessages ? users : null}
         <div className = {styles.Body}>
           {this.state.showMessages ? messages : null}
+          <div style={{ float:"left", clear: "both" }}
+            ref={(el) => { this.messagesEnd = el; }}>
+          </div>
         </div>
          {this.state.showMessages ? createMessage : null}
       </div>

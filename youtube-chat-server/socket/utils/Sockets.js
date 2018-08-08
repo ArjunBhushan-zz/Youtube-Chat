@@ -4,17 +4,18 @@ class Sockets {
   constructor () {
     this.sockets = [];
   }
-  addSocket (socketId, username) {
+  addSocket (socketId, username, room) {
     this.sockets = this.sockets.concat({
       socketId,
       username,
+      room,
       latency: []
     });
   }
-  isSocket(username) {
+  isSocket(username, room) {
     let roomIndex = -1;
     this.sockets.forEach((socket, index) => {
-      if (socket.username === username){
+      if (socket.username === username && socket.room === room){
         roomIndex = index;
       }
     });
@@ -29,12 +30,12 @@ class Sockets {
     });
     return roomIndex;
   }
-  removeSocket(username){
-    if(this.isSocket(username) === -1){
+  removeSocket(username, room){
+    if(this.isSocket(username, room) === -1){
       return;
     }else{
       let newSockets = [...this.sockets];
-      newSockets.splice(this.isSocket(username),1);
+      newSockets.splice(this.isSocket(username, room),1);
       this.sockets = newSockets;
     }
   }
@@ -47,8 +48,8 @@ class Sockets {
       this.sockets = newSockets;
     }
   }
-  updateLatency(username, latency) {
-    let index = this.isSocket(username);
+  updateLatency(username, room, latency) {
+    let index = this.isSocket(username, room);
     if (index === -1) {
       return;
     }else{
@@ -58,8 +59,8 @@ class Sockets {
     }
   }
 
-  calculateLatency(username) {
-    let index = this.isSocket(username);
+  calculateLatency(username, room) {
+    let index = this.isSocket(username, room);
     if (index === -1) {
       return 0;
     }else{
@@ -139,39 +140,3 @@ class Sockets {
 module.exports = {
   Sockets
 };
-
-// const rooms = new Rooms();
-// const sockets = new Sockets();
-// rooms.addRoom('squad', 5);
-// rooms.addUser('arjun', 'squad');
-// rooms.addUser('brian', 'squad');
-// rooms.addRoom('test', 4);
-// rooms.addUser('dowson', 'test');
-// rooms.addUser('kevin', 'test');
-// rooms.removeUser('brian', 'test');
-// rooms.updateLatency('test', 5);
-// rooms.updateLatency('test', 6);
-// rooms.updateLatency('test', 7);
-// rooms.updateLatency('test', 8);
-// rooms.updateLatency('test', 9);
-// //console.log(rooms.rooms);
-//
-//
-// sockets.addSocket(12321412, 'arjun');
-// sockets.addSocket(123224112, 'brian');
-// sockets.updateLatency('arjun', 5);
-// sockets.updateLatency('brian', 9);
-// sockets.updateLatency('arjun', 6);
-// sockets.updateLatency('brian', 7);
-// sockets.updateLatency('arjun', 8);
-// sockets.updateLatency('arjun', 5);
-// sockets.updateLatency('brian', 9);
-// sockets.updateLatency('arjun', 6);
-// sockets.updateLatency('brian', 7);
-// sockets.updateLatency('arjun', 8);
-// // sockets.removeSocket('brian');
-// // console.log(sockets.sockets);
-// // console.log(sockets.calculateLatency('brian'));
-// // console.log(sockets.getUsername(null));
-// //console.log(sockets.getAllSockets(rooms.rooms));
-// console.log(sockets.getSocketsByRoom(rooms, 'test'));

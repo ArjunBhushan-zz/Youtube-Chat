@@ -1,3 +1,7 @@
 .Rooms {
+  width: 50%;
+  margin: auto;
+  display: flex;
   color: black;
+  flex-wrap: wrap;
 }

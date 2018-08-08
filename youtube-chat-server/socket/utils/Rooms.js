@@ -1,9 +1,27 @@
+const axios = require ('axios');
+
 class Rooms {
   constructor () {
-    this.rooms = [];
+    axios.get('https://youtube-chat-api.herokuapp.com/rooms')
+      .then((storedRooms) => {
+        let rooms = storedRooms.data.map((storedRoom) => {
+          return {
+            name: storedRoom.name,
+            latency: [],
+            users: []
+          };
+        });
+        this.rooms = rooms;
+      })
+      .catch((err) => {
+        this.rooms = [];
+      });
   }
   isRoom(roomName){
     let roomIndex = -1;
+    if (!this.rooms){
+      return roomIndex;
+    }
     this.rooms.forEach((room, index) => {
       if (room.name=== roomName){
         roomIndex = index;
@@ -107,18 +125,3 @@ class Rooms {
 module.exports = {
   Rooms
 };
-
-// const rooms = new Rooms();
-// rooms.addRoom('squad', 5);
-// rooms.removeRoom('squad');
-// rooms.addRoom('test', 4);
-// rooms.addUser('arjun', 'test');
-// rooms.addUser('brian', 'test');
-// rooms.removeUser('brian', 'test');
-// rooms.addUser('dowson', 'test');
-// rooms.updateLatency('test', 5);
-// rooms.updateLatency('test', 6);
-// rooms.updateLatency('test', 7);
-// rooms.updateLatency('test', 8);
-// rooms.updateLatency('test', 9);
-// console.log(rooms.rooms);
