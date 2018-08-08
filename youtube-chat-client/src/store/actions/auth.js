@@ -41,8 +41,7 @@ const logoutHandler = () => {
 
 export const logout = () => {
   return (dispatch) => {
-    let token;
-    //const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
     if (!token){
       return dispatch(logoutHandler());
     }
@@ -103,12 +102,10 @@ export const auth = (username, password, isSignup, display) => {
 
 export const authCheckState = () => {
   return (dispatch) => {
-    let token;
     const token = localStorage.getItem('token');
     if (!token) {
       dispatch(logout());
     } else {
-      let username;
       const username = localStorage.getItem('username');
       dispatch(authSuccess(token, username));
     }
