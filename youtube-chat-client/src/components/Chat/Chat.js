@@ -188,8 +188,8 @@ class Chat extends Component {
     }
   }
 
-  componentDidUpdate(){
-    if (this.state.showMessages){
+  componentDidUpdate(prevProps, prevState){
+    if (this.state.showMessages && this.state.messages && prevState.messages && this.state.messages.length !== prevState.messages.length){
       this.scrollToBottom();
     }
   }

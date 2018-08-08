@@ -160,7 +160,17 @@ app.delete('/rooms/:roomName', authenticate, (req, res) => {
           if (!room) {
             return res.status(404).send();
           }
-          res.send(room);
+          let deleteMessagePromises = [];
+          room.messages.forEach((message) => {
+            deleteMessagePromises.push(Message.findByIdAndRemove(message._message));
+          });
+          Promise.all(deleteMessagePromises)
+            .then(() => {
+              res.send(room);
+            })
+            .catch((err) => {
+              res.send(room);
+            });
         })
         .catch((err) => {
           res.status(400).send(err);
@@ -254,7 +264,6 @@ app.post('/users/login', (req, res) => {
 });
 
 app.delete('/users/me/token', authenticate, (req,res) => {
-  console.log(req.token);
   req.user.removeToken(req.token)
     .then(() => {
       res.status(200).send();
