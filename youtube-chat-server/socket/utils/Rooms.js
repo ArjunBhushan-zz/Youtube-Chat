@@ -88,28 +88,38 @@ class Rooms {
       this.rooms = tempRooms;
     }
   }
-  addUser(username, room) {
+  addUser(username, room, socketId) {
     let index = this.isRoom(room);
     if (index === -1) {
       return;
     }else{
       let tempRooms = [...this.rooms];
-      tempRooms[index].users.push(username);
+      let duplicate = false;
+      tempRooms[index].users.forEach((user) => {
+        if (user.username === username) {
+          duplicate = true;
+        }
+      });
+      if (duplicate){
+        return;
+      }
+      tempRooms[index].users.push({username, socketId});
       this.room = tempRooms;
     }
   }
-  removeUser(username, room) {
+  removeUser(username, room, socketId) {
     let indexRoom = this.isRoom(room);
     if (indexRoom === -1) {
       return;
     }else{
       let tempRooms = [...this.rooms];
-      if (tempRooms[indexRoom].users.indexOf(username) === -1){
-        return;
-      }else {
-        tempRooms[indexRoom].users.splice(tempRooms[indexRoom].users.indexOf(username), 1);
-        this.rooms = tempRooms;
-      }
+      tempRooms[indexRoom].users.forEach((user, indexUser) =>{
+        if (user.socketId ===  socketId) {
+          tempRooms[indexRoom].users.splice(indexUser, 1);
+          this.rooms = tempRooms;
+        }
+      });
+      return;
     }
   }
   getUsers(room) {

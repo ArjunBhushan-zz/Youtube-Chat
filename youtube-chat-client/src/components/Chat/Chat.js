@@ -66,7 +66,7 @@ class Chat extends Component {
 
   componentDidMount () {
     //get all previous in messages the room
-    const socket = io('https://youtube-chat-socket.herokuapp.com/');
+    const socket = io('https://youtube-chat-socket.herokuapp.com/', {'sync disconnect on unload' : true});
     this.socket = socket;
     socket.on('connect', () => {
       socket.emit('join', this.state.user);
@@ -95,8 +95,8 @@ class Chat extends Component {
         if (room.name === this.props.room) {
           let currentUsers = [];
           room.users.forEach((user, index) => {
-            if (user && currentUsers.indexOf(user) === -1){
-              currentUsers.push(user);
+            if (user.username && currentUsers.indexOf(user.username) === -1){
+              currentUsers.push(user.username);
             }
           });
           this.setState({currentUsers})

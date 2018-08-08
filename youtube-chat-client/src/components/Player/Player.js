@@ -70,7 +70,7 @@ class Player extends Component {
             }
           });
       });
-    const socket = io('https://youtube-chat-socket.herokuapp.com/');
+    const socket = io('https://youtube-chat-socket.herokuapp.com/', {'sync disconnect on unload' : true});
     this.socket = socket;
     socket.on('connect', () => {
       socket.emit('join', this.state.user);

@@ -27,7 +27,7 @@ class Home extends Component {
     .catch((err) => {
       this.setState({error: 'Could not get rooms', loading: false});
     });
-  const socket = io('https://youtube-chat-socket.herokuapp.com/');
+  const socket = io('https://youtube-chat-socket.herokuapp.com/', {'sync disconnect on unload' : true})
   this.socket = socket;
   socket.on('connect', () => {
     socket.emit('sendRooms');
@@ -56,19 +56,19 @@ class Home extends Component {
     if (this.state.showRooms && !this.state.loading){
       rooms = <Rooms rooms = {this.state.allRooms}/>;
     }
-    // let activeRooms = <Spinner/>;
-    // if (this.state.allRooms && !this.state.activeLoading){
-    //   activeRooms = <Rooms rooms = {this.state.activeRooms}/>;
-    // }
+    let activeRooms = <Spinner/>;
+      if (this.state.allRooms && !this.state.activeLoading){
+      activeRooms = <Rooms rooms = {this.state.activeRooms}/>;
+    }
     return (
       <div className = {styles.Home}>
         {error}
         <h4>Enter Room</h4>
         <EnterRoom/>
         <hr/>
-        {/*}<h4>Active Rooms</h4>
+        <h4>Active Rooms</h4>
         {activeRooms}
-        <hr/>*/}
+        <hr/>
         <h4>All Rooms</h4>
         {rooms}
       </div>
