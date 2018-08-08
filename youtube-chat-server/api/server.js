@@ -176,6 +176,7 @@ app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['username', 'password', 'display']);
   if (!body.display) {
     body = _.pick(body, ['username', 'password']);
+    body.display = body.username;
   }
   var user = new User(body);
   User.findOne({username: body.username})
