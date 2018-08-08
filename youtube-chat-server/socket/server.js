@@ -64,7 +64,7 @@ io.on('connection', (socket) => {
 
   socket.on('timeChange', (user, currTime) => {
     //console.log(`[Socket]: Video now at ${currTime}.`);
-    socket.broadcast.to(user.room).emit('timeSync', currTime + (rooms.calculateLatency(user.room) + 120)/1000, sockets.sockets);
+    socket.broadcast.to(user.room).emit('timeSync', currTime + (rooms.calculateLatency(user.room) + 135)/1000, sockets.sockets);
     let currentTime = Date.now();
     socket.emit('setLatency', () => {
       rooms.updateLatency(user.room, (Date.now() - currentTime)/2);
