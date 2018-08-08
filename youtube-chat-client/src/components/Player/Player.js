@@ -38,7 +38,7 @@ class Player extends Component {
     currentUrl:'',
     urlTouched: false,
     urlValid: false,
-    playingUrl: 'https://www.youtube.com/watch?v=2YBtspm8j8M',
+    playingUrl: 'https://www.youtube.com/watch?v=vLTijKmSq4Y',
     roomOwner: false,
     videoPaused: false,
     user: {
@@ -67,7 +67,6 @@ class Player extends Component {
           .then((user) => {
             if (owner.data._owner === user.data._id) {
               this.setState({roomOwner: true});
-              this.socket.emit('urlChange', this.state.user, this.state.playingUrl);
             }
           });
       });
