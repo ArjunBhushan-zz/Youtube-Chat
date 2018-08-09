@@ -19,17 +19,34 @@ class App extends Component {
       <Switch>
         <Route path = "/auth" component = {Auth}/>
         <Route path= "/rooms" component={VideoChat}/>
-        <Route path= "/me" component = {Me}/>
-        <Route path= "/logout" component={Logout}/>
         <Route path = "/" exact component = {Home}/>
         <Redirect to = '/'/>
       </Switch>
     );
+
+    if (this.props.auth) {
+      routes = (
+        <Switch>
+          <Route path = "/auth" component = {Auth}/>
+          <Route path= "/rooms" component={VideoChat}/>
+          <Route path= "/me" component = {Me}/>
+          <Route path= "/logout" component={Logout}/>
+          <Route path = "/" exact component = {Home}/>
+          <Redirect to = '/'/>
+        </Switch>
+      );
+    }
     return (
       <Layout>
         {routes}
       </Layout>
     );
+  }
+}
+
+const mapStateToProps = (state) => {
+  return {
+    auth: state.auth.token !== ''
   }
 }
 
@@ -39,4 +56,4 @@ const mapDispatchToProps = (dispatch) => {
   };
 };
 
-export default withRouter(connect(null, mapDispatchToProps)(App));
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(App));
