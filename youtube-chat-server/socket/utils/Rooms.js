@@ -33,6 +33,9 @@ class Rooms {
     if (this.isRoom(room) !== -1) {
       return;
     }else{
+      if (!this.rooms){
+        this.rooms = [];
+      }
       this.rooms = this.rooms.concat({
         name: room,
         latency: [],
@@ -121,6 +124,18 @@ class Rooms {
       });
       return;
     }
+  }
+  allSockets(){
+    if (!this.rooms) {
+      this.rooms = [];
+    }
+    let sockets = [];
+    this.rooms.forEach((room) => {
+      room.users.forEach((user) => {
+        sockets.push(user.socketId);
+      });
+    });
+    return sockets;
   }
   removeUserBySocketId(socketId) {
     this.rooms.forEach((room, indexRoom) => {

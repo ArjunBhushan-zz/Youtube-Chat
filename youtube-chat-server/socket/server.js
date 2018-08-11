@@ -156,13 +156,11 @@ io.on('connection', (socket) => {
   });
   socket.on('sendRooms', () => {
     let allSockets = Object.keys(io.sockets.sockets);
-    allSockets.forEach((socketId) => {
-      sockets.sockets.forEach((socket) => {
-        if (allSockets.indexOf(socket.socketId) === -1){
-          sockets.removeSocketById(socket.socketId);
-          rooms.removeUserBySocketId(socket.socketId);
-        }
-      })
+    rooms.allSockets().forEach((socketId) => {
+      if(allSockets.indexOf(socketId) === -1) {
+        rooms.removeUserBySocketId(socketId);
+        sockets.removeSocketById(socketId);
+      }
     });
     io.emit('getRooms', rooms.rooms);
   });
