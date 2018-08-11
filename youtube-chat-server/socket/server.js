@@ -72,7 +72,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('timeChange', (user, currTime) => {
-    console.log(rooms.rooms);
     let roomName  = qs.parse(user.room);
     user.room = Object.keys(roomName)[0];
     //console.log(`[Socket]: Video now at ${currTime}.`);

@@ -66,10 +66,8 @@ class Chat extends Component {
 
   componentDidMount () {
     //get all previous in messages the room
-    let socket = io('http://localhost:8080/');
-    if (process.env.PORT) {
-      socket = io('https://youtube-chat-socket.herokuapp.com/');
-    }
+    //const socket = io('http://localhost:8080/');
+    const socket = io('https://youtube-chat-socket.herokuapp.com/');
     this.socket = socket;
     socket.on('connect', () => {
       socket.emit('join', this.state.user);
