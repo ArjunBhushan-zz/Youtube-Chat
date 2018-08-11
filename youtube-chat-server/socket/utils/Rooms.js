@@ -122,6 +122,16 @@ class Rooms {
       return;
     }
   }
+  removeUserBySocketId(socketId) {
+    this.rooms.forEach((room, indexRoom) => {
+      room.users.forEach((user, indexUser) => {
+        if (user.socketId === socketId){
+          let tempRooms = [...this.rooms];
+          tempRooms[indexRoom].users.splice(indexUser, 1);
+        }
+      });
+    });
+  }
   getUsers(room) {
     let index = this.isRoom(room);
     if(index === -1) {

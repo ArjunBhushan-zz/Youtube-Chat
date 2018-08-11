@@ -72,6 +72,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('timeChange', (user, currTime) => {
+    console.log(rooms.rooms);
     let roomName  = qs.parse(user.room);
     user.room = Object.keys(roomName)[0];
     //console.log(`[Socket]: Video now at ${currTime}.`);
@@ -124,10 +125,17 @@ io.on('connection', (socket) => {
     socket.broadcast.to(user.room).emit('playVideo');
   });
 
-  socket.on('createMessage', (user, display, text) => {
+  socket.on('createMessage', (user, text) => {
     let roomName  = qs.parse(user.room);
     user.room = Object.keys(roomName)[0];
     let date = Date.now();
+    let display = 'Anonymous';
+    if (user.username) {
+      display = user.username;
+    }
+    if (user.display){
+      display = user.display;
+    }
     io.to(user.room).emit('newMessage', {
       date,
       text,
@@ -148,6 +156,15 @@ io.on('connection', (socket) => {
     }
   });
   socket.on('sendRooms', () => {
+    let allSockets = Object.keys(io.sockets.sockets);
+    allSockets.forEach((socketId) => {
+      sockets.sockets.forEach((socket) => {
+        if (allSockets.indexOf(socket.socketId) === -1){
+          sockets.removeSocketById(socket.socketId);
+          rooms.removeUserBySocketId(socket.socketId);
+        }
+      })
+    });
     io.emit('getRooms', rooms.rooms);
   });
 });

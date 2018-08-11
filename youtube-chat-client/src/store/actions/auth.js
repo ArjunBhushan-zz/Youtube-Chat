@@ -22,7 +22,9 @@ const authFail = (error) => {
 };
 
 const processError = (error) => {
-  if (error.response.status === 404) {
+  if (!error.response){
+    return `Network error`;
+  }else if (error.response.status === 404) {
     return `Credentials Not Found`;
   }else if (error.response.status === 401) {
     return `Unauthorized Credentials`;

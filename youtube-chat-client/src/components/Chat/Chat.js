@@ -66,16 +66,16 @@ class Chat extends Component {
 
   componentDidMount () {
     //get all previous in messages the room
-    const socket = io('https://youtube-chat-socket.herokuapp.com/', {'sync disconnect on unload' : true});
+    let socket = io('http://localhost:8080/');
+    if (process.env.PORT) {
+      socket = io('https://youtube-chat-socket.herokuapp.com/');
+    }
     this.socket = socket;
     socket.on('connect', () => {
       socket.emit('join', this.state.user);
       socket.emit('sendRooms');
     });
     socket.on('newMessage', (message) => {
-      if (!message.display){
-        message.display = this.state.user.username;
-      }
       this.setState({
         messages: this.state.messages.concat(message),
         controls: {
@@ -182,9 +182,9 @@ class Chat extends Component {
   newMessageHandler = (e) =>{
     e.preventDefault();
     if (!this.props.token){
-      this.socket.emit('createMessage', this.state.user, 'Anonymous', this.state.controls.message.value);
+      this.socket.emit('createMessage', this.state.user, this.state.controls.message.value);
     }else{
-      this.socket.emit('createMessage', this.state.user, this.state.user.display, this.state.controls.message.value);
+      this.socket.emit('createMessage', this.state.user, this.state.controls.message.value);
     }
   }
 
