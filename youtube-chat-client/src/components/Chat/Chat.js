@@ -8,6 +8,8 @@ import collapseArrow from './../../assets/images/collapse-arrow.png';
 import expandArrow from './../../assets/images/expand-arrow.png';
 import Message from './Message/Message';
 import Input from './../UI/Input/Input';
+import Spinner from './../UI/Spinner/Spinner';
+
 class Chat extends Component {
   state = {
     user: {
@@ -18,6 +20,7 @@ class Chat extends Component {
     },
     messages: [],
     showMessages: false,
+    loadMessages: false,
     controls: {
       message: {
         elementType: 'input',
@@ -110,6 +113,8 @@ class Chat extends Component {
   onShowComments = () => {
     if (this.state.showMessages){
       return this.setState({showMessages: false});
+    }else{
+      this.setState({loadMessages: true, showMessages: true});
     }
     axios({
       method: 'get',
@@ -151,10 +156,10 @@ class Chat extends Component {
                 this.scrollToBottom = () => {
                   this.messagesEnd.scrollIntoView({ behavior: "smooth" });
                 }
-                this.setState({messages: roomMessages, showMessages: true});
+                this.setState({messages: roomMessages, loadMessages: false});
               })
               .catch((err) => {
-                this.setState({showMessages: true, messages: [{
+                this.setState({loadMessages: false, messages: [{
                   display: 'Admin',
                   text: 'Something went wrong. Could not load chat.',
                   date: Date.now()
@@ -162,7 +167,7 @@ class Chat extends Component {
               });
           })
           .catch((err) => {
-            this.setState({showMessages: true, messages: [{
+            this.setState({loadMessages: false, messages: [{
               display: 'Admin',
               text: 'Something went wrong. Could not load chat.',
               date: Date.now()
@@ -170,7 +175,7 @@ class Chat extends Component {
           });
       })
       .catch((err) => {
-        this.setState({showMessages: true, messages: [{
+        this.setState({loadMessages: false, messages: [{
           display: 'Admin',
           text: 'Something went wrong. Could not load chat.',
           date: Date.now()
@@ -189,7 +194,7 @@ class Chat extends Component {
   }
 
   componentDidUpdate(prevProps, prevState){
-    if (this.state.showMessages && this.state.messages && prevState.messages && this.state.messages.length !== prevState.messages.length){
+    if (((this.state.showMessages && this.state.messages.length !== prevState.messages.length) || (prevState.showMessages !== this.state.showMessages)) && this.scrollToBottom){
       this.scrollToBottom();
     }
   }
@@ -224,6 +229,9 @@ class Chat extends Component {
       messages = this.state.messages.map((message) => {
         return <Message display = {message.display} date = {message.date} text = {message.text}  key={`${message.display}-${message.date}-${message.text}`}/>
       });
+    }
+    if (this.state.loadMessages){
+      messages = <Spinner/>;
     }
     let createMessage = (
       <div className = {styles.Footer}>
