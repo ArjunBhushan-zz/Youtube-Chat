@@ -25,7 +25,7 @@ io.on('connection', (socket) => {
       rooms.addUser(user.username, user.room, socket.id);
     }else{
       if (rooms.rooms[rooms.isRoom(user.room)].url) {
-        socket.broadcast.to(user.room).emit('urlSync', rooms.rooms[rooms.isRoom(user.room)].url);
+        socket.to(user.room).emit('urlSync', rooms.rooms[rooms.isRoom(user.room)].url);
       }
       rooms.addUser(user.username, user.room, socket.id);
     }

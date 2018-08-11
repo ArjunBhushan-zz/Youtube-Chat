@@ -179,7 +179,9 @@ class Chat extends Component {
   };
   newMessageHandler = (e) =>{
     e.preventDefault();
-    if (!this.props.token){
+    if (!this.state.controls.message.valid){
+      return;
+    }else if (!this.props.token){
       this.socket.emit('createMessage', this.state.user, this.state.controls.message.value);
     }else{
       this.socket.emit('createMessage', this.state.user, this.state.controls.message.value);

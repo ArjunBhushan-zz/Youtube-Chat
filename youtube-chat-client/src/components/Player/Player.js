@@ -88,7 +88,8 @@ class Player extends Component {
             clientLatency = getAverage(sockets[i].latency);
           }
         }
-        this.player.seekTo(newTime + (clientLatency/2)/1000);
+        let seekTime = parseFloat(newTime + (clientLatency/2)/1000);
+        this.player.seekTo(seekTime.toFixed(3));
       }
     });
     socket.on('pauseVideo', () => {
@@ -180,7 +181,7 @@ class Player extends Component {
   onSeekHandler = (e) => {
     const newTime = e.target.value;
     this.setState({videoTime: newTime});
-    this.player.seekTo(newTime);
+    this.player.seekTo(newTime.toFixed(3));
     if (this.state.roomOwner) {
       this.socket.emit('timeChange', this.state.user, newTime);
     }
