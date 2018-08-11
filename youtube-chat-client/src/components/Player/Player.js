@@ -9,6 +9,9 @@ import { connect } from 'react-redux';
 import Auxiliary from './../../hoc/Auxiliary/Auxiliary';
 import axios from 'axios';
 import { withRouter } from 'react-router-dom';
+import pause from './../../assets/images/pause.svg';
+import play from './../../assets/images/play.svg';
+
 
 const getAverage = (array) => {
   let averageLatency = 0;
@@ -38,9 +41,10 @@ class Player extends Component {
     currentUrl:'',
     urlTouched: false,
     urlValid: false,
-    playingUrl: 'https://www.youtube.com/watch?v=vLTijKmSq4Y',
+    playingUrl: 'https://www.youtube.com/watch?v=vLTijKmSq4Y&vq=small',
     roomOwner: false,
     videoPaused: false,
+    videoTime: 0,
     user: {
       username: this.props.username || localStorage.getItem('username'),
       room: this.props.room,
@@ -120,8 +124,9 @@ class Player extends Component {
     this.player = player
   }
   onProgressHandler = (progress) => {
+    this.setState({videoTime: progress.playedSeconds});
     this.socket.emit('updateLatency', this.state.user);
-    if (this.state.roomOwner && !this.state.videoPaused) {
+    if (this.state.roomOwner && !this.state.videoPaused && Math.floor(progress.playedSeconds).toFixed(0) % 2 === 0) {
       this.socket.emit('timeChange', this.state.user, progress.playedSeconds);
     }
   }
@@ -172,6 +177,14 @@ class Player extends Component {
         this.setState({error: 'Could not delete room'});
       });
   }
+  onSeekHandler = (e) => {
+    const newTime = e.target.value;
+    this.setState({videoTime: newTime});
+    this.player.seekTo(newTime);
+    if (this.state.roomOwner) {
+      this.socket.emit('timeChange', this.state.user, newTime);
+    }
+  }
   render() {
     const form = (
       <div className = {styles.Url}>
@@ -201,6 +214,37 @@ class Player extends Component {
     if (this.state.error) {
       error = (<p className = {styles.Error}> {this.state.error}</p>);
     }
+    let controls = (
+      <div className = {styles.Controls}>
+        <img src= {pause} alt="pause video" className = {styles.Control} onClick = {this.onPauseHandler}/>
+        <img src= {play} alt = "play video" className = {styles.Control} onClick = {this.onPlayHandler}/>
+        <input
+          type="range"
+          min="0"
+          max={this.state.videoTime + 2}
+          step = "0.000000001"
+          value={this.state.videoTime}
+          className= {styles.Slider}
+          onChange = {this.onPauseHandler}/>
+      </div>
+    );
+    if (this.player){
+      controls = (
+        <div className = {styles.Controls}>
+          {this.state.videoPaused ?
+            <img src= {play} alt = "play video" className = {styles.Control} onClick = {this.onPlayHandler}/> :
+            <img src= {pause} alt="pause video" className = {styles.Control} onClick = {this.onPauseHandler}/> }
+          <input
+            type="range"
+            min="0"
+            max={this.player.getDuration()}
+            step = "0.01"
+            value={this.state.videoTime}
+            className= {styles.Slider}
+            onChange = {this.onSeekHandler}/>
+        </div>
+      );
+    }
     return (
       <Auxiliary>
         {error}
@@ -213,10 +257,11 @@ class Player extends Component {
           loop
           width = {this.props.windowWidth*0.8}
           height = {this.props.windowWidth*9/16*0.8}
-          progressInterval ={2500}
+          progressInterval ={500}
           onProgress = {this.onProgressHandler}
           onPause = {this.onPauseHandler}
           onPlay = {this.onPlayHandler}/>
+        {this.state.roomOwner ? controls : null}
         {this.state.roomOwner ? deleteButton : null}
       </Auxiliary>
     );
