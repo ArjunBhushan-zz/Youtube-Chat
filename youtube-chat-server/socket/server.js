@@ -144,7 +144,7 @@ io.on('connection', (socket) => {
       axios({
         method: 'post',
         url: `https://youtube-chat-api.herokuapp.com/rooms/message/${user.room}`,
-        headers: {'x-auth': user.token},
+        headers: {'x-auth': user.token, 'Content-Type' : 'application/json'},
         data: {
           text
         }

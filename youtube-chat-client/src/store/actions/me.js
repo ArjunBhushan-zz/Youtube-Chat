@@ -37,7 +37,7 @@ export const updateUser = (token, display) => {
     axios({
       method: 'patch',
       url: 'https://youtube-chat-api.herokuapp.com/users/me/',
-      headers: {'x-auth': token.toString()},
+      headers: {'x-auth': token.toString(), 'Content-Type' : 'application/json'},
       data: {
         display
       }
@@ -61,7 +61,7 @@ const getAllRooms = async (rooms, token) => {
           {
             method: 'get',
             url: `https://youtube-chat-api.herokuapp.com/rooms/${names.name}`,
-            headers: {'x-auth': token.toString()},
+            headers: {'x-auth': token.toString(), 'Content-Type' : 'application/json'},
           }
         ));
       }
@@ -79,7 +79,7 @@ export const loadUser = (token) => {
     axios({
       method: 'get',
       url: 'https://youtube-chat-api.herokuapp.com/users/me',
-      headers: {'x-auth': token.toString()},
+      headers: {'x-auth': token.toString(), 'Content-Type' : 'application/json'},
     })
       .then((res) => {
         getAllRooms(res.data.visitedRooms, token)

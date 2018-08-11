@@ -51,7 +51,7 @@ export const logout = () => {
     axios({
       url,
       method: 'delete',
-      headers: {'x-auth': `${token}`}
+      headers: {'x-auth': `${token}`, 'Content-Type' : 'application/json'}
     })
       .then((res) => {
         dispatch(logoutHandler());

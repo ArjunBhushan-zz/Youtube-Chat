@@ -119,7 +119,7 @@ class Chat extends Component {
     axios({
       method: 'get',
       url: `https://youtube-chat-api.herokuapp.com/rooms/${this.state.user.room}`,
-      headers: {'x-auth': this.props.token}
+      headers: {'x-auth': this.props.token, 'Content-Type' : 'application/json'}
     })
       .then((roomInfo) => {
         let messagePromises = [];
@@ -127,7 +127,7 @@ class Chat extends Component {
           messagePromises.push(axios({
               method: 'get',
               url: `https://youtube-chat-api.herokuapp.com/messages/${message._message}`,
-              headers: {'x-auth': this.props.token}
+              headers: {'x-auth': this.props.token, 'Content-Type' : 'application/json'}
             }));
         });
         Promise.all(messagePromises)
@@ -142,7 +142,7 @@ class Chat extends Component {
               displayPromises.push(axios({
                 method: 'get',
                 url: `https://youtube-chat-api.herokuapp.com/users/user/${message.data._user}`,
-                headers: {'x-auth': this.props.token}
+                headers: {'x-auth': this.props.token, 'Content-Type' : 'application/json'}
               }));
             });
             Promise.all(displayPromises)
@@ -186,9 +186,9 @@ class Chat extends Component {
     e.preventDefault();
     if (!this.state.controls.message.valid){
       return;
-    }else if (!this.props.token){
-      this.socket.emit('createMessage', this.state.user, this.state.controls.message.value);
     }else{
+      console.log(this.state.user);
+      console.log(this.state.controls.message.value);
       this.socket.emit('createMessage', this.state.user, this.state.controls.message.value);
     }
   }

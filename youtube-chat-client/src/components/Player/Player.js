@@ -57,7 +57,8 @@ class Player extends Component {
       method: 'get',
       url: `https://youtube-chat-api.herokuapp.com/rooms/${this.state.user.room}`,
       headers: {
-        'x-auth': this.props.token || localStorage.getItem('token')
+        'x-auth': this.props.token || localStorage.getItem('token'),
+        'Content-Type' : 'application/json'
       }
     })
       .then((owner) => {
@@ -65,7 +66,8 @@ class Player extends Component {
           method: 'get',
           url: `https://youtube-chat-api.herokuapp.com/users/me`,
           headers: {
-            'x-auth': this.props.token || localStorage.getItem('token')
+            'x-auth': this.props.token || localStorage.getItem('token'),
+            'Content-Type' : 'application/json'
           }
         })
           .then((user) => {
@@ -89,7 +91,7 @@ class Player extends Component {
           }
         }
         let seekTime = parseFloat(newTime + (clientLatency/2)/1000);
-        this.player.seekTo(seekTime.toFixed(3));
+        this.player.seekTo(seekTime);
       }
     });
     socket.on('pauseVideo', () => {
@@ -167,7 +169,7 @@ class Player extends Component {
   deleteRoomHandler = () => {
     axios({
       method: 'delete',
-      headers: {'x-auth': this.props.token},
+      headers: {'x-auth': this.props.token, 'Content-Type' : 'application/json'},
       url: `https://youtube-chat-api.herokuapp.com/rooms/${this.state.user.room}`
     })
       .then((res) => {
@@ -181,7 +183,7 @@ class Player extends Component {
   onSeekHandler = (e) => {
     const newTime = e.target.value;
     this.setState({videoTime: newTime});
-    this.player.seekTo(newTime.toFixed(3));
+    this.player.seekTo(newTime);
     if (this.state.roomOwner) {
       this.socket.emit('timeChange', this.state.user, newTime);
     }
