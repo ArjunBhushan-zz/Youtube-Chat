@@ -2,6 +2,13 @@
 
 The Youtube-Chat application solves a problem that I have recently encountered. Currently there isn't a proper tool to watch videos with your family or friends simultaneously. With the use of sockets, we are able to sync videos on multiple users' computers, monitor the host's latency, and each client's latency to allow devices in the same room to be synced *perfectly*. To use this web application, please go to [application link](https://chat-31768.firebaseapp.com/ "Youtube-Chat Application").
 
+Views:
+![home page](/Snapshots/homePage.png")
+![login page](/Snapshots/loginPage.png")
+![user page](/Snapshots/mePage.png")
+![video chat page top](/Snapshots/videoPageTop.png")
+![video chat page bot](/Snapshots/videoPageBot.png")
+
 How the application works:
 1. Create an account - don't worry, all passwords are hashed and salted using bcrypt (https://www.npmjs.com/package/bcrypt)
 2. Create a room in the 'Me' tab or go to one of your owned rooms. You can also change your display name in this tab.
