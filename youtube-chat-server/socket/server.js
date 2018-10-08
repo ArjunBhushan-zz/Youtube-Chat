@@ -22,13 +22,11 @@ io.on('connection', (socket) => {
     sockets.addSocket(socket.id, user.username, user.room);
     if(rooms.isRoom(user.room) === -1){
       rooms.addRoom(user.room);
-      rooms.addUser(user.username, user.room, socket.id);
-    }else{
-      if (rooms.rooms[rooms.isRoom(user.room)].url) {
-        socket.to(user.room).emit('urlSync', rooms.rooms[rooms.isRoom(user.room)].url);
-      }
-      rooms.addUser(user.username, user.room, socket.id);
     }
+    if (rooms.rooms[rooms.isRoom(user.room)].url) {
+      socket.to(user.room).emit('urlSync', rooms.rooms[rooms.isRoom(user.room)].url);
+    }
+    rooms.addUser(user.username, user.room, socket.id);
     io.emit('getRooms', rooms.rooms);
   });
 
